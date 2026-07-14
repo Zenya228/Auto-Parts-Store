@@ -1,7 +1,6 @@
 package by.vstu.auto.parts.store.dto.request;
 
-public record PartEditRequestDto(
-        Long id,
+public record BrandCreateRequestDto(
         String name
 ) {
 }

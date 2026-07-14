@@ -8,4 +8,8 @@ public class ResourceExceptionFactory {
     public static ResourceNotFoundException PartNotFoundException(Long id){
         return new ResourceNotFoundException(id, "Part id = %s not found".formatted(id));
     }
+
+    public static ResourceNotFoundException BrandNotFoundException(Long id){
+        return new ResourceNotFoundException(id, "Brand id = %s not found".formatted(id));
+    }
 }
