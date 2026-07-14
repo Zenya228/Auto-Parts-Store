@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public class CategoryServiceImpl implements CategoryService {
+
     @Override
     public Page<Category> getCategoriesByPage(Pageable pageable) {
         return null;
