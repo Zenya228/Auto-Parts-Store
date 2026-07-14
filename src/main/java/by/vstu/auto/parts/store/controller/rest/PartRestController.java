@@ -3,6 +3,7 @@ package by.vstu.auto.parts.store.controller.rest;
 import by.vstu.auto.parts.store.dto.request.BrandCreateRequestDto;
 import by.vstu.auto.parts.store.dto.request.PartCreateRequestDto;
 import by.vstu.auto.parts.store.dto.request.PartEditRequestDto;
+import by.vstu.auto.parts.store.dto.request.PartFilterRequestDto;
 import by.vstu.auto.parts.store.dto.response.BrandInfoResponseDto;
 import by.vstu.auto.parts.store.dto.response.ErrorInfoResponseDto;
 import by.vstu.auto.parts.store.dto.response.PartInfoResponseDto;
@@ -22,6 +23,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+
 @Tag(name = "Запчасти и бренды", description = "Управление запчастями и брендами")
 @RestController
 @RequestMapping("api/v1/parts")
@@ -32,13 +35,19 @@ public class PartRestController {
 
     // PARTS
 
-    @Operation(summary = "Получить запчасти постранично", description = "Возвращает страницу запчастей с заданным номером и размером страницы")
+    @Operation(summary = "Получить запчасти постранично", description = "Возвращает страницу запчастей с заданным номером и размером страницы, с опциональной фильтрацией")
     @ApiResponse(responseCode = "200", description = "Страница запчастей успешно получена")
     @GetMapping("/{pageNumber}/{pageSize}")
     public Page<PartInfoResponseDto> getPartsByPage(
             @Parameter(description = "Номер страницы, начиная с 0") @PathVariable int pageNumber,
-            @Parameter(description = "Количество элементов на странице") @PathVariable int pageSize) {
-        return partService.getPartsByPage(PageRequest.of(pageNumber, pageSize));
+            @Parameter(description = "Количество элементов на странице") @PathVariable int pageSize,
+            @Parameter(description = "Id категории") @RequestParam(required = false) Long categoryId,
+            @Parameter(description = "Id бренда") @RequestParam(required = false) Long brandId,
+            @Parameter(description = "Минимальная цена") @RequestParam(required = false) BigDecimal minPrice,
+            @Parameter(description = "Максимальная цена") @RequestParam(required = false) BigDecimal maxPrice,
+            @Parameter(description = "Только позиции в наличии") @RequestParam(required = false) Boolean inStockOnly) {
+        PartFilterRequestDto filter = new PartFilterRequestDto(categoryId, brandId, minPrice, maxPrice, inStockOnly);
+        return partService.getPartsByPage(filter, PageRequest.of(pageNumber, pageSize));
     }
 
     @Operation(summary = "Получить запчасть по id", description = "Возвращает запчасть по её id")

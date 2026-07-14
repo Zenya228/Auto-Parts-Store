@@ -3,6 +3,7 @@ package by.vstu.auto.parts.store.sevice.impl;
 import by.vstu.auto.parts.store.dto.request.BrandCreateRequestDto;
 import by.vstu.auto.parts.store.dto.request.PartCreateRequestDto;
 import by.vstu.auto.parts.store.dto.request.PartEditRequestDto;
+import by.vstu.auto.parts.store.dto.request.PartFilterRequestDto;
 import by.vstu.auto.parts.store.dto.response.BrandInfoResponseDto;
 import by.vstu.auto.parts.store.dto.response.CategoryInfoResponseDto;
 import by.vstu.auto.parts.store.dto.response.PartInfoResponseDto;
@@ -15,6 +16,7 @@ import by.vstu.auto.parts.store.mapper.PartMapper;
 import by.vstu.auto.parts.store.repository.BrandRepository;
 import by.vstu.auto.parts.store.repository.CategoryRepository;
 import by.vstu.auto.parts.store.repository.PartRepository;
+import by.vstu.auto.parts.store.repository.specification.PartSpecifications;
 import by.vstu.auto.parts.store.sevice.PartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -56,8 +58,8 @@ public class PartServiceImpl implements PartService {
     // PARTS
 
     @Override
-    public Page<PartInfoResponseDto> getPartsByPage(Pageable pageable) {
-        Page<Part> parts = partRepository.findAll(pageable);
+    public Page<PartInfoResponseDto> getPartsByPage(PartFilterRequestDto filter, Pageable pageable) {
+        Page<Part> parts = partRepository.findAll(PartSpecifications.filter(filter), pageable);
 
         return parts.map(partMapper::mapToResponse);
     }

@@ -1,5 +1,6 @@
 package by.vstu.auto.parts.store.controller.mvc;
 
+import by.vstu.auto.parts.store.dto.request.PartFilterRequestDto;
 import by.vstu.auto.parts.store.sevice.CategoryService;
 import by.vstu.auto.parts.store.sevice.PartService;
 import lombok.RequiredArgsConstructor;
@@ -17,10 +18,11 @@ public class HomeController {
 
     @GetMapping("/")
     public String home(Model model) {
+        PartFilterRequestDto noFilter = PartFilterRequestDto.empty();
         model.addAttribute("categoryCount", categoryService.getCategoriesByPage(PageRequest.of(0, 1)).getTotalElements());
         model.addAttribute("brandCount", partService.getBrandsByPage(PageRequest.of(0, 1)).getTotalElements());
-        model.addAttribute("partCount", partService.getPartsByPage(PageRequest.of(0, 1)).getTotalElements());
-        model.addAttribute("recentParts", partService.getPartsByPage(PageRequest.of(0, 5)).getContent());
+        model.addAttribute("partCount", partService.getPartsByPage(noFilter, PageRequest.of(0, 1)).getTotalElements());
+        model.addAttribute("recentParts", partService.getPartsByPage(noFilter, PageRequest.of(0, 5)).getContent());
         return "index";
     }
 }

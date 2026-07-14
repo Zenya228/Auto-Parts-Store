@@ -2,6 +2,9 @@ package by.vstu.auto.parts.store.controller.mvc;
 
 import by.vstu.auto.parts.store.dto.request.PartCreateRequestDto;
 import by.vstu.auto.parts.store.dto.request.PartEditRequestDto;
+import by.vstu.auto.parts.store.dto.request.PartFilterRequestDto;
+import by.vstu.auto.parts.store.dto.response.BrandInfoResponseDto;
+import by.vstu.auto.parts.store.dto.response.CategoryInfoResponseDto;
 import by.vstu.auto.parts.store.exception.common.ResourceNotFoundException;
 import by.vstu.auto.parts.store.sevice.CategoryService;
 import by.vstu.auto.parts.store.sevice.PartService;
@@ -19,6 +22,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Controller
@@ -32,15 +37,25 @@ public class PartController {
     private final CategoryService categoryService;
 
     @GetMapping
-    public String list(@RequestParam(defaultValue = "0") int page, Model model) {
-        Page<?> parts = partService.getPartsByPage(PageRequest.of(page, PAGE_SIZE));
-        model.addAttribute("parts", parts);
+    public String list(@RequestParam(defaultValue = "0") int page,
+                        @RequestParam(required = false) Long categoryId,
+                        @RequestParam(required = false) Long brandId,
+                        @RequestParam(required = false) BigDecimal minPrice,
+                        @RequestParam(required = false) BigDecimal maxPrice,
+                        @RequestParam(required = false) Boolean inStockOnly,
+                        Model model) {
+        PartFilterRequestDto filter = new PartFilterRequestDto(categoryId, brandId, minPrice, maxPrice, inStockOnly);
 
-        Pageable unpaged = Pageable.unpaged();
-        model.addAttribute("categoryNames", categoryService.getCategoriesByPage(unpaged).getContent().stream()
-                .collect(Collectors.toMap(c -> c.id(), c -> c.name())));
-        model.addAttribute("brandNames", partService.getBrandsByPage(unpaged).getContent().stream()
-                .collect(Collectors.toMap(b -> b.id(), b -> b.name())));
+        Page<?> parts = partService.getPartsByPage(filter, PageRequest.of(page, PAGE_SIZE));
+        model.addAttribute("parts", parts);
+        model.addAttribute("filter", filter);
+
+        List<CategoryInfoResponseDto> categories = categoryService.getCategoriesByPage(Pageable.unpaged()).getContent();
+        List<BrandInfoResponseDto> brands = partService.getBrandsByPage(Pageable.unpaged()).getContent();
+        model.addAttribute("categories", categories);
+        model.addAttribute("brands", brands);
+        model.addAttribute("categoryNames", categories.stream().collect(Collectors.toMap(c -> c.id(), c -> c.name())));
+        model.addAttribute("brandNames", brands.stream().collect(Collectors.toMap(b -> b.id(), b -> b.name())));
 
         return "parts/list";
     }

@@ -10,10 +10,54 @@
             <div th:replace="~{fragments/alerts :: alerts}"></div>
 
             <div class="card">
+                <form method="get" th:action="@{/parts}" class="filter-form">
+                    <div class="form-row filter-row">
+                        <div class="form-group">
+                            <label for="f-categoryId">Категория</label>
+                            <select id="f-categoryId" name="categoryId">
+                                <option value="">Все категории</option>
+                                <option th:each="category : ${categories}" th:value="${category.id()}" th:text="${category.name()}"
+                                        th:selected="${filter.categoryId() != null and filter.categoryId() == category.id()}">Категория</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="f-brandId">Бренд</label>
+                            <select id="f-brandId" name="brandId">
+                                <option value="">Все бренды</option>
+                                <option th:each="brand : ${brands}" th:value="${brand.id()}" th:text="${brand.name()}"
+                                        th:selected="${filter.brandId() != null and filter.brandId() == brand.id()}">Бренд</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="f-minPrice">Цена от</label>
+                            <input type="number" id="f-minPrice" name="minPrice" step="0.01" min="0" placeholder="0" th:value="${filter.minPrice()}">
+                        </div>
+                        <div class="form-group">
+                            <label for="f-maxPrice">Цена до</label>
+                            <input type="number" id="f-maxPrice" name="maxPrice" step="0.01" min="0" placeholder="∞" th:value="${filter.maxPrice()}">
+                        </div>
+                    </div>
+                    <div class="filter-actions">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="inStockOnly" value="true" th:checked="${filter.inStockOnly() != null and filter.inStockOnly()}">
+                            Только в наличии
+                        </label>
+                        <div class="filter-buttons">
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                <span th:replace="~{fragments/icons :: icon-check}"></span>
+                                Применить
+                            </button>
+                            <a class="btn btn-outline btn-sm" th:href="@{/parts}">Сбросить</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card">
                 <div class="page-header">
                     <div>
                         <h2>Каталог запчастей</h2>
-                        <p th:text="${parts.totalElements} + ' всего'">0 всего</p>
+                        <p th:text="${parts.totalElements} + ' найдено'">0 всего</p>
                     </div>
                     <a class="btn btn-primary" th:href="@{/parts/new}">
                         <span th:replace="~{fragments/icons :: icon-plus}"></span>
@@ -75,7 +119,20 @@
                     </table>
                 </div>
 
-                <div th:replace="~{fragments/pagination :: pagination(${parts}, '/parts')}"></div>
+                <div class="pagination" th:if="${parts.totalPages > 1}">
+                    <a th:href="@{/parts(page=${parts.number - 1}, categoryId=${filter.categoryId}, brandId=${filter.brandId}, minPrice=${filter.minPrice}, maxPrice=${filter.maxPrice}, inStockOnly=${filter.inStockOnly})}"
+                       th:classappend="${parts.first} ? 'disabled'">
+                        <span th:replace="~{fragments/icons :: icon-chevron-left}"></span>
+                    </a>
+                    <th:block th:each="i : ${#numbers.sequence(0, parts.totalPages - 1)}">
+                        <a th:href="@{/parts(page=${i}, categoryId=${filter.categoryId}, brandId=${filter.brandId}, minPrice=${filter.minPrice}, maxPrice=${filter.maxPrice}, inStockOnly=${filter.inStockOnly})}"
+                           th:text="${i + 1}" th:classappend="${i == parts.number} ? 'active'">1</a>
+                    </th:block>
+                    <a th:href="@{/parts(page=${parts.number + 1}, categoryId=${filter.categoryId}, brandId=${filter.brandId}, minPrice=${filter.minPrice}, maxPrice=${filter.maxPrice}, inStockOnly=${filter.inStockOnly})}"
+                       th:classappend="${parts.last} ? 'disabled'">
+                        <span th:replace="~{fragments/icons :: icon-chevron-right}"></span>
+                    </a>
+                </div>
             </div>
         </main>
     </div>
