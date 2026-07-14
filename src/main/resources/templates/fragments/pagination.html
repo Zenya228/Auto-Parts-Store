@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="pagination(page, baseUrl)" class="pagination" th:if="${page.totalPages > 1}">
+    <a th:href="@{${baseUrl}(page=${page.number - 1})}" th:classappend="${page.first} ? 'disabled'">
+        <span th:replace="~{fragments/icons :: icon-chevron-left}"></span>
+    </a>
+    <th:block th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}">
+        <a th:href="@{${baseUrl}(page=${i})}" th:text="${i + 1}" th:classappend="${i == page.number} ? 'active'">1</a>
+    </th:block>
+    <a th:href="@{${baseUrl}(page=${page.number + 1})}" th:classappend="${page.last} ? 'disabled'">
+        <span th:replace="~{fragments/icons :: icon-chevron-right}"></span>
+    </a>
+</div>
+</body>
+</html>

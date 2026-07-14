@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Редактирование категории')}"></head>
+<body>
+<div class="app">
+    <aside th:replace="~{fragments/sidebar :: sidebar('categories')}"></aside>
+    <div class="main">
+        <header th:replace="~{fragments/topbar :: topbar('Редактирование категории')}"></header>
+        <main class="content">
+            <div class="card card-narrow">
+                <div class="page-header">
+                    <div>
+                        <h2>Редактировать категорию</h2>
+                        <p>Измените название категории</p>
+                    </div>
+                </div>
+                <form method="post" th:action="@{/categories/{id}(id=${category.id})}" th:object="${category}">
+                    <input type="hidden" th:field="*{id}">
+                    <div class="form-group">
+                        <label for="name">Название</label>
+                        <input type="text" id="name" th:field="*{name}" autofocus>
+                        <div class="field-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Ошибка</div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Сохранить</button>
+                        <a class="btn btn-outline" th:href="@{/categories}">Отмена</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+</div>
+<script th:src="@{/js/theme.js}"></script>
+</body>
+</html>

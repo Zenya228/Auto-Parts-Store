@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Дашборд')}"></head>
+<body>
+<div class="app">
+    <aside th:replace="~{fragments/sidebar :: sidebar('home')}"></aside>
+    <div class="main">
+        <header th:replace="~{fragments/topbar :: topbar('Дашборд')}"></header>
+        <main class="content">
+            <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="icon" th:insert="~{fragments/icons :: icon-tag}"></div>
+                    <div class="value" th:text="${categoryCount}">0</div>
+                    <div class="label">Категорий</div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon" th:insert="~{fragments/icons :: icon-brand}"></div>
+                    <div class="value" th:text="${brandCount}">0</div>
+                    <div class="label">Брендов</div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon" th:insert="~{fragments/icons :: icon-part}"></div>
+                    <div class="value" th:text="${partCount}">0</div>
+                    <div class="label">Запчастей</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="page-header">
+                    <div>
+                        <h2>Недавно добавленные запчасти</h2>
+                        <p>Последние 5 позиций каталога</p>
+                    </div>
+                    <a class="btn btn-primary" th:href="@{/parts/new}">
+                        <span th:replace="~{fragments/icons :: icon-plus}"></span>
+                        Добавить запчасть
+                    </a>
+                </div>
+
+                <div th:if="${#lists.isEmpty(recentParts)}" class="empty-state">
+                    <div class="icon" th:insert="~{fragments/icons :: icon-part}"></div>
+                    <h3>Пока нет запчастей</h3>
+                    <p>Добавьте первую позицию, чтобы увидеть её здесь</p>
+                    <a class="btn btn-primary" th:href="@{/parts/new}">Добавить запчасть</a>
+                </div>
+
+                <div class="table-wrap" th:unless="${#lists.isEmpty(recentParts)}">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Запчасть</th>
+                            <th>Цена</th>
+                            <th>Наличие</th>
+                            <th>Добавлена</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="part : ${recentParts}">
+                            <td>
+                                <div class="cell-with-thumb">
+                                    <img class="thumb" th:src="@{/parts/{id}/image(id=${part.id()})}" alt=""
+                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <span class="thumb-placeholder" style="display:none" th:insert="~{fragments/icons :: icon-image}"></span>
+                                    <span class="cell-name" th:text="${part.name()}">Название</span>
+                                </div>
+                            </td>
+                            <td th:text="${part.price()} + ' BYN'">0 BYN</td>
+                            <td>
+                                <span class="badge" th:classappend="${part.stock() != null and part.stock() > 0} ? 'badge-success' : 'badge-danger'"
+                                      th:text="${part.stock() != null ? part.stock() : 0} + ' шт.'">0 шт.</span>
+                            </td>
+                            <td class="cell-muted" th:text="${#temporals.format(part.createdAt(), 'dd.MM.yyyy')}">01.01.2026</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<script th:src="@{/js/theme.js}"></script>
+</body>
+</html>

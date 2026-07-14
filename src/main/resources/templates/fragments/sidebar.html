@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<aside th:fragment="sidebar(active)" class="sidebar">
+    <div class="brand">
+        <span class="brand-icon" th:replace="~{fragments/icons :: icon-part}"></span>
+        <span>Auto Parts Store</span>
+    </div>
+
+    <div class="nav-section-label">Меню</div>
+    <nav class="nav-links">
+        <a th:href="@{/}" class="nav-link" th:classappend="${active == 'home'} ? 'active'">
+            <span th:replace="~{fragments/icons :: icon-dashboard}"></span>
+            <span>Дашборд</span>
+        </a>
+        <a th:href="@{/categories}" class="nav-link" th:classappend="${active == 'categories'} ? 'active'">
+            <span th:replace="~{fragments/icons :: icon-tag}"></span>
+            <span>Категории</span>
+        </a>
+        <a th:href="@{/brands}" class="nav-link" th:classappend="${active == 'brands'} ? 'active'">
+            <span th:replace="~{fragments/icons :: icon-brand}"></span>
+            <span>Бренды</span>
+        </a>
+        <a th:href="@{/parts}" class="nav-link" th:classappend="${active == 'parts'} ? 'active'">
+            <span th:replace="~{fragments/icons :: icon-box}"></span>
+            <span>Запчасти</span>
+        </a>
+    </nav>
+
+    <div class="sidebar-footer">Auto Parts Store &middot; v1</div>
+</aside>
+</body>
+</html>

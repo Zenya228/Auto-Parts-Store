@@ -63,6 +63,11 @@ public class PartServiceImpl implements PartService {
     }
 
     @Override
+    public PartInfoResponseDto getById(Long id) {
+        return partMapper.mapToResponse(findPartById(id));
+    }
+
+    @Override
     public PartInfoResponseDto create(PartCreateRequestDto requestDto) {
 
         Part part = Part.builder()
@@ -112,6 +117,11 @@ public class PartServiceImpl implements PartService {
         partRepository.delete(partFromDb);
 
         return partInfoResponseDto;
+    }
+
+    @Override
+    public byte[] getImage(Long id) {
+        return findPartById(id).getImage();
     }
 
 

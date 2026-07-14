@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<header th:fragment="topbar(title)" class="topbar">
+    <h1 th:text="${title}">Title</h1>
+    <div class="topbar-actions">
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Переключить тему">
+            <span th:replace="~{fragments/icons :: icon-sun}"></span>
+            <span th:replace="~{fragments/icons :: icon-moon}"></span>
+        </button>
+    </div>
+</header>
+</body>
+</html>

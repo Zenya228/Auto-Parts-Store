@@ -14,11 +14,15 @@ public interface PartService {
 
     Page<PartInfoResponseDto> getPartsByPage(Pageable pageable);
 
+    PartInfoResponseDto getById(Long id);
+
     PartInfoResponseDto create(PartCreateRequestDto requestDto);
 
     PartInfoResponseDto edit(PartEditRequestDto requestDto);
 
     PartInfoResponseDto delete(Long id);
+
+    byte[] getImage(Long id);
 
     // BRANDS
 

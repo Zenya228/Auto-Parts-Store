@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Запчасти')}"></head>
+<body>
+<div class="app">
+    <aside th:replace="~{fragments/sidebar :: sidebar('parts')}"></aside>
+    <div class="main">
+        <header th:replace="~{fragments/topbar :: topbar('Запчасти')}"></header>
+        <main class="content">
+            <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+            <div class="card">
+                <div class="page-header">
+                    <div>
+                        <h2>Каталог запчастей</h2>
+                        <p th:text="${parts.totalElements} + ' всего'">0 всего</p>
+                    </div>
+                    <a class="btn btn-primary" th:href="@{/parts/new}">
+                        <span th:replace="~{fragments/icons :: icon-plus}"></span>
+                        Добавить запчасть
+                    </a>
+                </div>
+
+                <div th:if="${parts.empty}" class="empty-state">
+                    <div class="icon" th:insert="~{fragments/icons :: icon-part}"></div>
+                    <h3>Пока нет запчастей</h3>
+                    <p>Добавьте первую запчасть в каталог</p>
+                    <a class="btn btn-primary" th:href="@{/parts/new}">Добавить запчасть</a>
+                </div>
+
+                <div class="table-wrap" th:unless="${parts.empty}">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Запчасть</th>
+                            <th>Категория</th>
+                            <th>Бренд</th>
+                            <th>Цена</th>
+                            <th>Наличие</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="part : ${parts.content}">
+                            <td>
+                                <div class="cell-with-thumb">
+                                    <img class="thumb" th:src="@{/parts/{id}/image(id=${part.id()})}" alt=""
+                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <span class="thumb-placeholder" style="display:none" th:insert="~{fragments/icons :: icon-image}"></span>
+                                    <span class="cell-name" th:text="${part.name()}">Название</span>
+                                </div>
+                            </td>
+                            <td class="cell-muted" th:text="${categoryNames.get(part.categoryId()) ?: '—'}">Категория</td>
+                            <td class="cell-muted" th:text="${brandNames.get(part.brandId()) ?: '—'}">Бренд</td>
+                            <td th:text="${part.price()} + ' BYN'">0 BYN</td>
+                            <td>
+                                <span class="badge" th:classappend="${part.stock() != null and part.stock() > 0} ? 'badge-success' : 'badge-danger'"
+                                      th:text="${part.stock() != null ? part.stock() : 0} + ' шт.'">0 шт.</span>
+                            </td>
+                            <td>
+                                <div class="row-actions">
+                                    <a class="btn btn-outline btn-sm btn-icon" th:href="@{/parts/{id}/edit(id=${part.id()})}" title="Редактировать">
+                                        <span th:replace="~{fragments/icons :: icon-edit}"></span>
+                                    </a>
+                                    <form method="post" th:action="@{/parts/{id}/delete(id=${part.id()})}"
+                                          onsubmit="return confirm('Удалить запчасть «' + this.dataset.name + '»?');" th:attr="data-name=${part.name()}">
+                                        <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Удалить">
+                                            <span th:replace="~{fragments/icons :: icon-trash}"></span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div th:replace="~{fragments/pagination :: pagination(${parts}, '/parts')}"></div>
+            </div>
+        </main>
+    </div>
+</div>
+<script th:src="@{/js/theme.js}"></script>
+</body>
+</html>

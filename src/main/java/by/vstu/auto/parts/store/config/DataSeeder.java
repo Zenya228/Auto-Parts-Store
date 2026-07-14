@@ -7,17 +7,38 @@ import by.vstu.auto.parts.store.repository.BrandRepository;
 import by.vstu.auto.parts.store.repository.CategoryRepository;
 import by.vstu.auto.parts.store.repository.PartRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 @Profile("dev")
 @RequiredArgsConstructor
+@Slf4j
 public class DataSeeder implements CommandLineRunner {
+
+    private static final List<String> CATEGORY_NAMES = List.of("Тормозная система", "Двигатель", "Подвеска", "Электрика");
+    private static final List<String> BRAND_NAMES = List.of("Bosch", "Febi Bilstein", "TRW", "Sachs");
+
+    private record SeedPart(String name, BigDecimal price, Integer stock, String categoryName, String brandName) {
+    }
+
+    private static final List<SeedPart> PARTS = List.of(
+            new SeedPart("Тормозной диск передний", new BigDecimal("120.50"), 15, "Тормозная система", "Bosch"),
+            new SeedPart("Тормозные колодки задние", new BigDecimal("65.00"), 30, "Тормозная система", "TRW"),
+            new SeedPart("Масляный фильтр", new BigDecimal("12.90"), 50, "Двигатель", "Febi Bilstein"),
+            new SeedPart("Свеча зажигания", new BigDecimal("8.40"), 100, "Двигатель", "Bosch"),
+            new SeedPart("Амортизатор передний", new BigDecimal("95.00"), 20, "Подвеска", "Sachs"),
+            new SeedPart("Стойка стабилизатора", new BigDecimal("28.75"), 40, "Подвеска", "TRW"),
+            new SeedPart("Аккумулятор 60Ah", new BigDecimal("210.00"), 10, "Электрика", "Bosch"),
+            new SeedPart("Генератор", new BigDecimal("340.00"), 5, "Электрика", "Febi Bilstein")
+    );
 
     private final CategoryRepository categoryRepository;
     private final BrandRepository brandRepository;
@@ -25,41 +46,64 @@ public class DataSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (categoryRepository.count() > 0) {
-            return;
+        int categoriesAdded = ensureCategories();
+        int brandsAdded = ensureBrands();
+        int partsAdded = ensureParts();
+
+        log.info("Test data seeding done: {} categories, {} brands, {} parts added",
+                categoriesAdded, brandsAdded, partsAdded);
+    }
+
+    private int ensureCategories() {
+        int added = 0;
+        for (String name : CATEGORY_NAMES) {
+            if (!categoryRepository.existsByName(name)) {
+                categoryRepository.save(Category.builder().name(name).build());
+                added++;
+            }
         }
+        return added;
+    }
 
-        List<Category> categories = categoryRepository.saveAll(List.of(
-                Category.builder().name("Тормозная система").build(),
-                Category.builder().name("Двигатель").build(),
-                Category.builder().name("Подвеска").build(),
-                Category.builder().name("Электрика").build()
-        ));
+    private int ensureBrands() {
+        int added = 0;
+        for (String name : BRAND_NAMES) {
+            if (!brandRepository.existsByName(name)) {
+                brandRepository.save(Brand.builder().name(name).build());
+                added++;
+            }
+        }
+        return added;
+    }
 
-        List<Brand> brands = brandRepository.saveAll(List.of(
-                Brand.builder().name("Bosch").build(),
-                Brand.builder().name("Febi Bilstein").build(),
-                Brand.builder().name("TRW").build(),
-                Brand.builder().name("Sachs").build()
-        ));
+    private int ensureParts() {
+        Map<String, Category> categoriesByName = categoryRepository.findAll().stream()
+                .collect(Collectors.toMap(Category::getName, c -> c, (a, b) -> a));
+        Map<String, Brand> brandsByName = brandRepository.findAll().stream()
+                .collect(Collectors.toMap(Brand::getName, b -> b, (a, b) -> a));
 
-        partRepository.saveAll(List.of(
-                Part.builder().name("Тормозной диск передний").price(new BigDecimal("120.50")).stock(15)
-                        .category(categories.get(0)).brand(brands.get(0)).build(),
-                Part.builder().name("Тормозные колодки задние").price(new BigDecimal("65.00")).stock(30)
-                        .category(categories.get(0)).brand(brands.get(2)).build(),
-                Part.builder().name("Масляный фильтр").price(new BigDecimal("12.90")).stock(50)
-                        .category(categories.get(1)).brand(brands.get(1)).build(),
-                Part.builder().name("Свеча зажигания").price(new BigDecimal("8.40")).stock(100)
-                        .category(categories.get(1)).brand(brands.get(0)).build(),
-                Part.builder().name("Амортизатор передний").price(new BigDecimal("95.00")).stock(20)
-                        .category(categories.get(2)).brand(brands.get(3)).build(),
-                Part.builder().name("Стойка стабилизатора").price(new BigDecimal("28.75")).stock(40)
-                        .category(categories.get(2)).brand(brands.get(2)).build(),
-                Part.builder().name("Аккумулятор 60Ah").price(new BigDecimal("210.00")).stock(10)
-                        .category(categories.get(3)).brand(brands.get(0)).build(),
-                Part.builder().name("Генератор").price(new BigDecimal("340.00")).stock(5)
-                        .category(categories.get(3)).brand(brands.get(1)).build()
-        ));
+        int added = 0;
+        for (SeedPart seedPart : PARTS) {
+            if (partRepository.existsByName(seedPart.name())) {
+                continue;
+            }
+
+            Category category = categoriesByName.get(seedPart.categoryName());
+            Brand brand = brandsByName.get(seedPart.brandName());
+            if (category == null || brand == null) {
+                log.warn("Skip seeding part '{}': category or brand missing", seedPart.name());
+                continue;
+            }
+
+            partRepository.save(Part.builder()
+                    .name(seedPart.name())
+                    .price(seedPart.price())
+                    .stock(seedPart.stock())
+                    .category(category)
+                    .brand(brand)
+                    .build());
+            added++;
+        }
+        return added;
     }
 }

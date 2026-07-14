@@ -10,6 +10,8 @@ public interface CategoryService {
 
     Page<CategoryInfoResponseDto> getCategoriesByPage(Pageable pageable);
 
+    CategoryInfoResponseDto getById(Long id);
+
     CategoryInfoResponseDto create(CategoryCreateRequestDto requestDto);
 
     CategoryInfoResponseDto edit(CategoryEditRequestDto requestDto);

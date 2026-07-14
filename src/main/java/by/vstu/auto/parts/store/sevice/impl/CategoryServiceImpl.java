@@ -34,6 +34,11 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public CategoryInfoResponseDto getById(Long id) {
+        return categoryMapper.mapToResponse(findCategoryById(id));
+    }
+
+    @Override
     public CategoryInfoResponseDto create(CategoryCreateRequestDto requestDto) {
 
         Category category = Category.builder()

@@ -35,6 +35,17 @@ public class CategoryRestController {
         return categoryService.getCategoriesByPage(PageRequest.of(pageNumber, pageSize));
     }
 
+    @Operation(summary = "Получить категорию по id", description = "Возвращает категорию по её id")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Категория найдена"),
+            @ApiResponse(responseCode = "404", description = "Категория с указанным id не найдена",
+                    content = @Content(schema = @Schema(implementation = ErrorInfoResponseDto.class)))
+    })
+    @GetMapping("/{id}")
+    public CategoryInfoResponseDto getById(@Parameter(description = "Id категории") @PathVariable Long id) {
+        return categoryService.getById(id);
+    }
+
     @Operation(summary = "Создать категорию", description = "Создаёт новую категорию запчастей")
     @ApiResponse(responseCode = "200", description = "Категория успешно создана")
     @PostMapping

@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Запчасти и бренды", description = "Управление запчастями и брендами")
@@ -38,6 +39,31 @@ public class PartRestController {
             @Parameter(description = "Номер страницы, начиная с 0") @PathVariable int pageNumber,
             @Parameter(description = "Количество элементов на странице") @PathVariable int pageSize) {
         return partService.getPartsByPage(PageRequest.of(pageNumber, pageSize));
+    }
+
+    @Operation(summary = "Получить запчасть по id", description = "Возвращает запчасть по её id")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Запчасть найдена"),
+            @ApiResponse(responseCode = "404", description = "Запчасть с указанным id не найдена",
+                    content = @Content(schema = @Schema(implementation = ErrorInfoResponseDto.class)))
+    })
+    @GetMapping("/{id}")
+    public PartInfoResponseDto getById(@Parameter(description = "Id запчасти") @PathVariable Long id) {
+        return partService.getById(id);
+    }
+
+    @Operation(summary = "Получить изображение запчасти", description = "Возвращает бинарные данные изображения запчасти")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Изображение найдено"),
+            @ApiResponse(responseCode = "404", description = "Изображение отсутствует или запчасть не найдена")
+    })
+    @GetMapping("/{id}/image")
+    public ResponseEntity<byte[]> getImage(@Parameter(description = "Id запчасти") @PathVariable Long id) {
+        byte[] image = partService.getImage(id);
+        if (image == null || image.length == 0) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(image);
     }
 
     @Operation(summary = "Создать запчасть", description = "Создаёт новую запчасть с изображением, привязанную к категории и бренду")

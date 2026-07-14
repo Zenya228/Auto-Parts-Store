@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Категории')}"></head>
+<body>
+<div class="app">
+    <aside th:replace="~{fragments/sidebar :: sidebar('categories')}"></aside>
+    <div class="main">
+        <header th:replace="~{fragments/topbar :: topbar('Категории')}"></header>
+        <main class="content">
+            <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+            <div class="card">
+                <div class="page-header">
+                    <div>
+                        <h2>Все категории</h2>
+                        <p th:text="${categories.totalElements} + ' всего'">0 всего</p>
+                    </div>
+                    <a class="btn btn-primary" th:href="@{/categories/new}">
+                        <span th:replace="~{fragments/icons :: icon-plus}"></span>
+                        Добавить категорию
+                    </a>
+                </div>
+
+                <div th:if="${categories.empty}" class="empty-state">
+                    <div class="icon" th:insert="~{fragments/icons :: icon-tag}"></div>
+                    <h3>Пока нет категорий</h3>
+                    <p>Создайте первую категорию, чтобы начать наполнять каталог</p>
+                    <a class="btn btn-primary" th:href="@{/categories/new}">Добавить категорию</a>
+                </div>
+
+                <div class="table-wrap" th:unless="${categories.empty}">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Название</th>
+                            <th>Создана</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="category : ${categories.content}">
+                            <td class="cell-name" th:text="${category.name()}">Название</td>
+                            <td class="cell-muted" th:text="${#temporals.format(category.createdAt(), 'dd.MM.yyyy HH:mm')}">01.01.2026</td>
+                            <td>
+                                <div class="row-actions">
+                                    <a class="btn btn-outline btn-sm btn-icon" th:href="@{/categories/{id}/edit(id=${category.id()})}" title="Редактировать">
+                                        <span th:replace="~{fragments/icons :: icon-edit}"></span>
+                                    </a>
+                                    <form method="post" th:action="@{/categories/{id}/delete(id=${category.id()})}"
+                                          onsubmit="return confirm('Удалить категорию «' + this.dataset.name + '»?');" th:attr="data-name=${category.name()}">
+                                        <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Удалить">
+                                            <span th:replace="~{fragments/icons :: icon-trash}"></span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div th:replace="~{fragments/pagination :: pagination(${categories}, '/categories')}"></div>
+            </div>
+        </main>
+    </div>
+</div>
+<script th:src="@{/js/theme.js}"></script>
+</body>
+</html>

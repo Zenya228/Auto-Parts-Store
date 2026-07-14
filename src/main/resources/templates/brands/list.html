@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Бренды')}"></head>
+<body>
+<div class="app">
+    <aside th:replace="~{fragments/sidebar :: sidebar('brands')}"></aside>
+    <div class="main">
+        <header th:replace="~{fragments/topbar :: topbar('Бренды')}"></header>
+        <main class="content">
+            <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+            <div class="card">
+                <div class="page-header">
+                    <div>
+                        <h2>Все бренды</h2>
+                        <p th:text="${brands.totalElements} + ' всего'">0 всего</p>
+                    </div>
+                    <a class="btn btn-primary" th:href="@{/brands/new}">
+                        <span th:replace="~{fragments/icons :: icon-plus}"></span>
+                        Добавить бренд
+                    </a>
+                </div>
+
+                <div th:if="${brands.empty}" class="empty-state">
+                    <div class="icon" th:insert="~{fragments/icons :: icon-brand}"></div>
+                    <h3>Пока нет брендов</h3>
+                    <p>Добавьте первый бренд, чтобы привязывать к нему запчасти</p>
+                    <a class="btn btn-primary" th:href="@{/brands/new}">Добавить бренд</a>
+                </div>
+
+                <div class="table-wrap" th:unless="${brands.empty}">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Название</th>
+                            <th>Создан</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="brand : ${brands.content}">
+                            <td class="cell-name" th:text="${brand.name()}">Название</td>
+                            <td class="cell-muted" th:text="${#temporals.format(brand.createdAt(), 'dd.MM.yyyy HH:mm')}">01.01.2026</td>
+                            <td>
+                                <div class="row-actions">
+                                    <form method="post" th:action="@{/brands/{id}/delete(id=${brand.id()})}"
+                                          onsubmit="return confirm('Удалить бренд «' + this.dataset.name + '»?');" th:attr="data-name=${brand.name()}">
+                                        <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Удалить">
+                                            <span th:replace="~{fragments/icons :: icon-trash}"></span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div th:replace="~{fragments/pagination :: pagination(${brands}, '/brands')}"></div>
+            </div>
+        </main>
+    </div>
+</div>
+<script th:src="@{/js/theme.js}"></script>
+</body>
+</html>

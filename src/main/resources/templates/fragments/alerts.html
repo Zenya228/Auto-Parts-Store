@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="alerts">
+    <div class="alert alert-success" th:if="${success != null}">
+        <span th:replace="~{fragments/icons :: icon-check}"></span>
+        <span th:text="${success}">Успешно</span>
+    </div>
+    <div class="alert alert-error" th:if="${error != null}">
+        <span th:replace="~{fragments/icons :: icon-alert}"></span>
+        <span th:text="${error}">Ошибка</span>
+    </div>
+</div>
+</body>
+</html>
