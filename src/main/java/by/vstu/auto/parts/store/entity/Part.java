@@ -23,7 +23,6 @@ public class Part {
 
     private String name;
 
-    @Lob
     @Column(columnDefinition = "BYTEA")
     private byte[] image;
 
