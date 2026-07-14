@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface CategoryService {
 
-    Page<Category> getCategoriesByPage(Pageable pageable);
+    Page<CategoryInfoResponseDto> getCategoriesByPage(Pageable pageable);
 
     CategoryInfoResponseDto create(CategoryCreateRequestDto requestDto);
 
