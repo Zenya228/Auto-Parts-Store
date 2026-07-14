@@ -8,15 +8,15 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
-@Table(name = "parts")
+@Table(name = "brands")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Data
-public class Part {
-
+public class Brand {
     @Id
     @GeneratedValue
     private Long id;
@@ -27,11 +27,8 @@ public class Part {
     @Column(columnDefinition = "BYTEA")
     private byte[] image;
 
-    @ManyToOne
-    private Category category;
-
-    @ManyToOne
-    private Brand brand;
+    @OneToMany
+    private List<Part> parts;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
