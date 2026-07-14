@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Table(name = "parts")
@@ -25,6 +26,10 @@ public class Part {
 
     @Column(columnDefinition = "BYTEA")
     private byte[] image;
+
+    private BigDecimal price;
+
+    private Integer stock;
 
     @ManyToOne
     private Category category;

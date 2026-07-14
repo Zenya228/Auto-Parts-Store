@@ -14,10 +14,10 @@ import static org.mapstruct.NullValuePropertyMappingStrategy.IGNORE;
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, nullValuePropertyMappingStrategy = IGNORE)
 public interface PartMapper {
 
-    PartInfoResponseDto mapToResponse(Part part);
-
     @Mapping(source = "category", target = "categoryId", qualifiedByName = "getCategoryId")
     @Mapping(source = "brand", target = "brandId", qualifiedByName = "getBrandId")
+    PartInfoResponseDto mapToResponse(Part part);
+
     List<PartInfoResponseDto> mapToResponse(List<Part> parts);
 
     Part update(@MappingTarget Part part, PartEditRequestDto requestDto);

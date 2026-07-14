@@ -17,16 +17,16 @@ import by.vstu.auto.parts.store.repository.CategoryRepository;
 import by.vstu.auto.parts.store.repository.PartRepository;
 import by.vstu.auto.parts.store.sevice.PartService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class PartServiceImpl implements PartService {
 
     private final PartRepository partRepository;
@@ -49,7 +49,7 @@ public class PartServiceImpl implements PartService {
 
     private Brand findBrandById(Long id) {
         return brandRepository.findById(id).orElseThrow(
-                () -> ResourceExceptionFactory.PartNotFoundException(id)
+                () -> ResourceExceptionFactory.BrandNotFoundException(id)
         );
     }
 
@@ -65,26 +65,30 @@ public class PartServiceImpl implements PartService {
     @Override
     public PartInfoResponseDto create(PartCreateRequestDto requestDto) {
 
-        Part part = null;
+        Part part = Part.builder()
+                .name(requestDto.name())
+                .image(readImage(requestDto.image()))
+                .price(requestDto.price())
+                .stock(requestDto.stock())
+                .category(findCategoryById(requestDto.categoryId()))
+                .brand(findBrandById(requestDto.brandId()))
+                .build();
+
+        Part partFromDb = partRepository.save(part);
+
+        return partMapper.mapToResponse(partFromDb);
+    }
+
+    private byte[] readImage(MultipartFile image) {
+        if (image == null || image.isEmpty()) {
+            return null;
+        }
 
         try {
-            part = Part.builder()
-                    .name(requestDto.name())
-                    .image(requestDto.image().getBytes())
-                    .category(findCategoryById(requestDto.categoryId()))
-                    .brand(findBrandById(requestDto.brandId()))
-                    .build();
+            return image.getBytes();
         } catch (IOException e) {
-            log.error("Cannot build part from request dto", e);
+            throw new UncheckedIOException("Cannot read part image", e);
         }
-
-        if (part != null) {
-            Part partFromDb = partRepository.save(part);
-
-            return partMapper.mapToResponse(partFromDb);
-        }
-
-        return null;
     }
 
     @Override

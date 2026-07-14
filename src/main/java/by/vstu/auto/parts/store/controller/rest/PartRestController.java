@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -46,7 +47,7 @@ public class PartRestController {
                     content = @Content(schema = @Schema(implementation = ErrorInfoResponseDto.class)))
     })
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public PartInfoResponseDto create(@ModelAttribute PartCreateRequestDto requestDto) {
+    public PartInfoResponseDto create(@Valid @ModelAttribute PartCreateRequestDto requestDto) {
         return partService.create(requestDto);
     }
 
@@ -57,7 +58,7 @@ public class PartRestController {
                     content = @Content(schema = @Schema(implementation = ErrorInfoResponseDto.class)))
     })
     @PutMapping
-    public PartInfoResponseDto edit(@RequestBody PartEditRequestDto requestDto) {
+    public PartInfoResponseDto edit(@Valid @RequestBody PartEditRequestDto requestDto) {
         return partService.edit(requestDto);
     }
 
@@ -86,7 +87,7 @@ public class PartRestController {
     @Operation(summary = "Создать бренд", description = "Создаёт новый бренд")
     @ApiResponse(responseCode = "200", description = "Бренд успешно создан")
     @PostMapping("/brands")
-    public BrandInfoResponseDto createBrand(@RequestBody BrandCreateRequestDto requestDto) {
+    public BrandInfoResponseDto createBrand(@Valid @RequestBody BrandCreateRequestDto requestDto) {
         return partService.createBrand(requestDto);
     }
 

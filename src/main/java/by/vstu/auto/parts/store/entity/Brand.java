@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -26,7 +28,9 @@ public class Brand {
     @Column(columnDefinition = "BYTEA")
     private byte[] image;
 
-    @OneToMany
+    @OneToMany(mappedBy = "brand")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<Part> parts;
 
     @CreationTimestamp
